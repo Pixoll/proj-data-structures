@@ -85,8 +85,8 @@ public:
         string decoded;
         min_heap_node *node = this->tree_root;
 
-        for (char i: encoded) {
-            node = i == '0' ? node->left : node->right;
+        for (const char c: encoded) {
+            node = c == '0' ? node->left : node->right;
 
             if (node->left == nullptr && node->right == nullptr) {
                 decoded += node->data;

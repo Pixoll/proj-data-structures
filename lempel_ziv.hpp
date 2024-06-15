@@ -11,14 +11,14 @@ using namespace std;
 
 class lempel_ziv {
 public:
-    typedef pair<int, int> lz_pair;
+    typedef vector<pair<uint64, uint64>> compressed_t;
 
     // TODO: fails on repeated characters
-    static vector<lz_pair> compress(const string &input) {
+    static compressed_t compress(const string &input) {
         trie trie;
-        vector<lz_pair> compressed;
+        compressed_t compressed;
 
-        for (int i = 0; i < input.size();) {
+        for (uint64 i = 0; i < input.size();) {
             auto [position, length] = trie.search(input, i);
 
             if (length == 0) {
@@ -36,7 +36,7 @@ public:
         return compressed;
     }
 
-    static string decompress(const vector<lz_pair> &compressed) {
+    static string decompress(const compressed_t &compressed) {
         string decompressed;
 
         for (const auto &[first, length]: compressed) {
@@ -45,7 +45,7 @@ public:
                 continue;
             }
 
-            const int position = first;
+            const uint64 position = first;
 
             if (position + length <= decompressed.size()) {
                 decompressed += decompressed.substr(position, length);
@@ -55,14 +55,14 @@ public:
             cerr << "Error: Invalid position or length in compressed data\n"
                  << "length: " << length << "\n"
                  << "position: " << position << "\n"
-                 << "decompressed.size(): " << decompressed.size() << "\n";
+                 << "decompressed.size(): " << decompressed.size() << endl;
             return "";
         }
 
         return decompressed;
     }
 
-    static string compressed_to_string(const vector<lz_pair> &compressed) {
+    static string compressed_to_string(const compressed_t &compressed) {
         stringstream output;
         for (const auto &[first, length]: compressed) {
             output << "(";

@@ -5,17 +5,18 @@
 
 using namespace std;
 
+typedef unsigned long long uint64;
+
 class trie {
 private:
     struct trie_node {
         trie_node *children[128]{};
-        int start = 0;
-        int length = 0;
+        uint64 start = 0;
+        uint64 length = 0;
 
         ~trie_node() {
-            for (auto &child: children) {
+            for (auto &child: children)
                 delete child;
-            }
         }
     };
 
@@ -30,10 +31,10 @@ public:
         delete this->root;
     }
 
-    void insert(const string &string, int start, int length) {
+    void insert(const string &string, uint64 start, uint64 length) {
         trie_node *current = this->root;
 
-        for (int i = start; i < start + length; ++i) {
+        for (uint64 i = start; i < start + length; ++i) {
             char c = string[i];
             if (current->children[c] == nullptr)
                 current->children[c] = new trie_node();
@@ -45,12 +46,12 @@ public:
         current->length = length;
     }
 
-    pair<int, int> search(const string &string, int start) {
+    pair<uint64, uint64> search(const string &string, uint64 start) {
         trie_node *current = this->root;
-        int max_length = 0;
-        int position = -1;
+        uint64 max_length = 0;
+        uint64 position = -1;
 
-        for (int i = start; i < string.size(); ++i) {
+        for (uint64 i = start; i < string.size(); ++i) {
             char c = string[i];
             if (current->children[c] == nullptr)
                 break;

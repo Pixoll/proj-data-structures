@@ -33,15 +33,15 @@ int main() {
 
     cout << "huffman encoded: " << encoded.length() << " bits\n"
          << encoded << "\n\n"
-         << "decoded matches: " << ((decoded == text) ? "true" : "false") << "\n\n"
+         << "decoded matches: " << (decoded == text ? "true" : "false") << "\n\n"
          << "===============================================================\n" << endl;
 
-    const vector<lempel_ziv::lz_pair> compressed = lempel_ziv::compress(text);
+    const lempel_ziv::compressed_t compressed = lempel_ziv::compress(text);
     const string decompressed = lempel_ziv::decompress(compressed);
 
     cout << "lempel-ziv compressed: " << compressed.size() * 8 << " bits\n"
          << lempel_ziv::compressed_to_string(compressed) << "\n\n"
-         << "decompressed matches: " << ((decompressed == text) ? "true" : "false") << endl;
+         << "decompressed matches: " << (decompressed == text ? "true" : "false") << endl;
 
     return 0;
 }

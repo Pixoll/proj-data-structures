@@ -35,10 +35,7 @@ public:
                 uint64 length = 1;
                 for (uint64 j = 1; j < input.length() - i; j++) {
                     const set<uint64> &indices = chars[input[i + j]];
-                    if (indices.empty())
-                        break;
-
-                    if (indices.find(position + j) == indices.end())
+                    if (indices.empty() || indices.find(position + j) == indices.end())
                         break;
 
                     length++;
@@ -70,18 +67,7 @@ public:
                 continue;
             }
 
-            const uint64 position = first;
-
-            if (position + length <= decompressed.size()) {
-                decompressed += decompressed.substr(position, length);
-                continue;
-            }
-
-            cerr << "Error: Invalid position or length in compressed data\n"
-                 << "length: " << length << "\n"
-                 << "position: " << position << "\n"
-                 << "decompressed.size(): " << decompressed.size() << endl;
-            return "";
+            decompressed += decompressed.substr(first, length);
         }
 
         return decompressed;

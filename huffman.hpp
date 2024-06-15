@@ -71,6 +71,11 @@ public:
     }
 
     string decode(const string &encoded) {
+        if (this->tree_root == nullptr) {
+            cerr << "huffman: encode something first" << endl;
+            exit(1);
+        }
+
         string decoded;
         min_heap_node *node = this->tree_root;
 

@@ -1,20 +1,20 @@
 #pragma once
 
 #include <string>
-#include <unordered_map>
+#include <utility>
 
 using namespace std;
 
 class trie {
 private:
     struct trie_node {
-        unordered_map<char, trie_node *> children;
+        trie_node *children[128]{};
         int start = 0;
         int length = 0;
 
         ~trie_node() {
-            for (auto &child : children) {
-                delete child.second;
+            for (auto &child: children) {
+                delete child;
             }
         }
     };
@@ -35,10 +35,8 @@ public:
 
         for (int i = start; i < start + length; ++i) {
             char c = string[i];
-            if (current->children.find(c) == current->children.end()) {
-                // TODO: investigate alleged memory leak
+            if (current->children[c] == nullptr)
                 current->children[c] = new trie_node();
-            }
 
             current = current->children[c];
         }
@@ -54,7 +52,7 @@ public:
 
         for (int i = start; i < string.size(); ++i) {
             char c = string[i];
-            if (current->children.find(c) == current->children.end())
+            if (current->children[c] == nullptr)
                 break;
 
             current = current->children[c];

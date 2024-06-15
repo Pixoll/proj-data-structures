@@ -15,8 +15,7 @@ class huffman {
 private:
     class min_heap_node {
     public:
-        // must be a non-printable ASCII char
-        static const char special_value = '\1';
+        static const char special_value = -1;
 
         const char data;
         uint64 freq;

@@ -25,6 +25,11 @@ private:
 
         min_heap_node(char data, uint64 freq) : data(data), freq(freq) {}
 
+        ~min_heap_node() {
+            delete this->left;
+            delete this->right;
+        }
+
         struct compare {
             bool operator()(min_heap_node *l, min_heap_node *r) {
                 return l->freq > r->freq;
@@ -37,7 +42,9 @@ private:
 public:
     huffman() = default;
 
-    ~huffman() = default;
+    ~huffman() {
+        delete this->tree_root;
+    }
 
     string encode(const string &input) {
         unordered_map<char, uint64> frequencies;

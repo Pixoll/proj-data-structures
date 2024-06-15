@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -14,32 +15,47 @@ class lempel_ziv {
 public:
     typedef vector<pair<uint64, uint64>> compressed_t;
 
-    // TODO: compressed size is not quite there yet
     static compressed_t compress(const string &input) {
-        unordered_map<char, uint64> chars;
+        unordered_map<char, set<uint64>> chars;
         compressed_t compressed;
 
         for (uint64 i = 0; i < input.length();) {
-            const char c1 = input[i];
-            if (chars.count(c1) == 0) {
-                chars[c1] = i;
-                compressed.emplace_back(c1, 0);
+            set<uint64> &positions = chars[input[i]];
+            if (positions.empty()) {
+                positions.insert(i);
+                compressed.emplace_back(input[i], 0);
                 i++;
                 continue;
             }
 
-            const uint64 position = chars[c1];
-            uint64 length = 1;
-            for (uint64 j = 1; j < input.length() - i; j++) {
-                const char c2 = input[i + j];
-                if (chars.count(c2) == 0 || chars[c2] != position + j)
-                    break;
+            uint64 chosen_position;
+            uint64 max_length = 0;
 
-                length++;
+            for (const uint64 position: positions) {
+                uint64 length = 1;
+                for (uint64 j = 1; j < input.length() - i; j++) {
+                    const set<uint64> &indices = chars[input[i + j]];
+                    if (indices.empty())
+                        break;
+
+                    if (indices.find(position + j) == indices.end())
+                        break;
+
+                    length++;
+                }
+
+                if (length > max_length) {
+                    max_length = length;
+                    chosen_position = position;
+                }
             }
 
-            compressed.emplace_back(position, length);
-            i += length;
+            positions.insert(i);
+            for (int j = 1; j < max_length; ++j)
+                chars[input[i + j]].insert(i + j);
+
+            compressed.emplace_back(chosen_position, max_length);
+            i += max_length;
         }
 
         return compressed;

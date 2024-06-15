@@ -1,0 +1,10 @@
+/.idea
+/CMakeFiles
+/.cmake
+/Testing
+/.ninja_*
+/build.ninja
+/cmake_install.cmake
+/CMakeCache.txt
+/*.exe
+/test.txt

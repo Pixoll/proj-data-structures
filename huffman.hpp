@@ -39,9 +39,9 @@ public:
 
     ~huffman() = default;
 
-    string encode(const string &text) {
+    string encode(const string &input) {
         unordered_map<char, uint64> frequencies;
-        for (const char c: text)
+        for (const char c: input)
             frequencies[c]++;
 
         this->tree_root = make_min_heap(frequencies);
@@ -64,7 +64,7 @@ public:
         }
 
         string encoded_data;
-        for (const char c: text)
+        for (const char c: input)
             encoded_data += encode_map[c];
 
         return encoded_data;

@@ -36,13 +36,12 @@ int main() {
          << "decoded matches: " << ((decoded == text) ? "true" : "false") << "\n\n"
          << "===============================================================\n" << endl;
 
-    lempel_ziv lz;
-    const string compressed = lz.compress(text);
-    const string decompressed = lz.decompress(compressed);
+    const vector<lempel_ziv::lz_pair> compressed = lempel_ziv::compress(text);
+    const string decompressed = lempel_ziv::decompress(compressed);
 
-    cout << "lempel-ziv compressed: " << compressed.length() << " bits\n"
-         << compressed << "\n\n"
-         << "decompressed matches: " << ((decoded == text) ? "true" : "false") << endl;
+    cout << "lempel-ziv compressed: " << compressed.size() * 16 << " bits\n"
+         << lempel_ziv::compressed_to_string(compressed) << "\n\n"
+         << "decompressed matches: " << ((decompressed == text) ? "true" : "false") << endl;
 
     return 0;
 }

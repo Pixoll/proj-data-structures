@@ -39,7 +39,7 @@ int main() {
     const vector<lempel_ziv::lz_pair> compressed = lempel_ziv::compress(text);
     const string decompressed = lempel_ziv::decompress(compressed);
 
-    cout << "lempel-ziv compressed: " << compressed.size() * 16 << " bits\n"
+    cout << "lempel-ziv compressed: " << compressed.size() * 8 << " bits\n"
          << lempel_ziv::compressed_to_string(compressed) << "\n\n"
          << "decompressed matches: " << ((decompressed == text) ? "true" : "false") << endl;
 

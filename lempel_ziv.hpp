@@ -21,16 +21,16 @@ public:
         for (int i = 0; i < input.size();) {
             auto [position, length] = trie.search(input, i);
 
-            if (length > 0) {
-                compressed.emplace_back(position, length);
-                trie.insert(input, i, length + 1);
-                i += length;
+            if (length == 0) {
+                compressed.emplace_back(input[i], 0);
+                trie.insert(input, i, 1);
+                i++;
                 continue;
             }
 
-            compressed.emplace_back(input[i], 0);
-            trie.insert(input, i, 1);
-            i++;
+            compressed.emplace_back(position, length);
+            trie.insert(input, i, length + 1);
+            i += length;
         }
 
         return compressed;
@@ -47,7 +47,7 @@ public:
 
             const int position = first;
 
-            if (position >= 0 && position + length <= decompressed.size()) {
+            if (position + length <= decompressed.size()) {
                 decompressed += decompressed.substr(position, length);
                 continue;
             }

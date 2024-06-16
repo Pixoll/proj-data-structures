@@ -1,4 +1,7 @@
 /.idea
 /cmake-build-*
+/data
+/graphs
 /*.exe
 /test.txt
+/graphs.py

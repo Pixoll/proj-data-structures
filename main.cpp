@@ -33,8 +33,8 @@ int main() {
         string input;
         performance p;
 
-        out_hm_times << "length,encode_t,decode_t\n";
-        out_lz_times << "length,compress_t,decompress_t\n";
+        out_hm_times << "length,encode,decode\n";
+        out_lz_times << "length,compress,decompress\n";
         out_bits << "length,huffman,lempel-ziv\n";
 
         for (int length = 1; length <= 1000; length++) {

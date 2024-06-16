@@ -38,6 +38,7 @@ def main() -> None:
             average_times.plot(title=f"Average times {dataset.replace("_", " ")}")
             plt.grid(axis="y")
             plt.ylabel("microseconds")
+            plt.xlabel("original string length")
             plt.savefig(f"{GRAPHS_DIR}{dataset}.png", dpi=300)
             plt.close()
 

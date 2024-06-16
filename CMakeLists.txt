@@ -8,4 +8,6 @@ add_executable(proj_data_structures main.cpp
         lempel_ziv.hpp
         performance.hpp
         lorem_ipsum_supplier.hpp
+        trie.hpp
+        lempel_ziv_fast.hpp
 )

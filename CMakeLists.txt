@@ -7,6 +7,5 @@ add_executable(proj_data_structures main.cpp
         huffman.hpp
         lempel_ziv.hpp
         performance.hpp
-        random_char_gen.hpp
         lorem_ipsum_supplier.hpp
 )

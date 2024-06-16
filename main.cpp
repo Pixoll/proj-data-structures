@@ -23,7 +23,7 @@ int main(const int argc, const char *argv[]) {
 
     lempel_ziv::decompress(lempel_ziv::compress("warmup"));
 
-    const int tests = argc > 1 ? strtol(argv[1], nullptr, 10) :  100;
+    const int tests = argc > 1 ? strtol(argv[1], nullptr, 10) : 100;
     const int length_step = 100;
     const int max_length = length_step * tests;
     const int max_iterations = 20;
@@ -39,7 +39,7 @@ int main(const int argc, const char *argv[]) {
 
     int last_length = 0;
     for (int length = length_step; length <= max_length; length += length_step) {
-        cout << "test " << length / 100 << endl;
+        cout << "test " << length / length_step << endl;
 
         while (last_length < length) {
             input += lorem_ipsum();
@@ -66,8 +66,8 @@ int main(const int argc, const char *argv[]) {
             const uint64 decompress_time = p.end();
 
             out_e_vs_c << length << ","
-                         << encode_time << ","
-                         << compress_time << "\n";
+                       << encode_time << ","
+                       << compress_time << "\n";
 
             out_de_vs_dc << length << ","
                          << decode_time << ","

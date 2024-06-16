@@ -12,7 +12,7 @@
 
 using namespace std;
 
-int main() {
+int main(const int argc, const char *argv[]) {
     if (filesystem::exists("data"))
         filesystem::remove_all("data");
 
@@ -23,19 +23,18 @@ int main() {
 
     lempel_ziv::decompress(lempel_ziv::compress("warmup"));
 
-    const int tests = 100;
+    const int tests = argc > 1 ? strtol(argv[1], nullptr, 10) :  100;
     const int length_step = 100;
     const int max_length = length_step * tests;
     const int max_iterations = 20;
 
-    lorem_ipsum_supplier generator;
-
-    stringstream out_hm_times, out_lz_times, out_bits;
+    lorem_ipsum_supplier lorem_ipsum;
+    stringstream out_e_vs_c, out_de_vs_dc, out_bits;
     string input;
     performance p;
 
-    out_hm_times << "length,encode,decode\n";
-    out_lz_times << "length,compress,decompress\n";
+    out_e_vs_c << "length,huffman,lempel-ziv\n";
+    out_de_vs_dc << "length,huffman,lempel-ziv\n";
     out_bits << "length,huffman,lempel-ziv\n";
 
     int last_length = 0;
@@ -43,7 +42,7 @@ int main() {
         cout << "test " << length / 100 << endl;
 
         while (last_length < length) {
-            input += generator();
+            input += lorem_ipsum();
             last_length++;
         }
 
@@ -66,12 +65,12 @@ int main() {
             lempel_ziv::decompress(compressed);
             const uint64 decompress_time = p.end();
 
-            out_hm_times << length << ","
+            out_e_vs_c << length << ","
                          << encode_time << ","
-                         << decode_time << "\n";
+                         << compress_time << "\n";
 
-            out_lz_times << length << ","
-                         << compress_time << ","
+            out_de_vs_dc << length << ","
+                         << decode_time << ","
                          << decompress_time << "\n";
 
             if (i == 0) {
@@ -82,16 +81,16 @@ int main() {
         }
     }
 
-    ofstream file_hm_times("data/huffman.csv");
-    ofstream file_lz_times("data/lempel_ziv.csv");
+    ofstream file_e_vs_c("data/encode_vs_compress.csv");
+    ofstream file_de_vs_dc("data/decode_vs_decompress.csv");
     ofstream file_bits("data/bits.csv");
 
-    file_hm_times << out_hm_times.rdbuf();
-    file_lz_times << out_lz_times.rdbuf();
+    file_e_vs_c << out_e_vs_c.rdbuf();
+    file_de_vs_dc << out_de_vs_dc.rdbuf();
     file_bits << out_bits.rdbuf();
 
-    file_hm_times.close();
-    file_lz_times.close();
+    file_e_vs_c.close();
+    file_de_vs_dc.close();
     file_bits.close();
 
     return 0;

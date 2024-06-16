@@ -19,9 +19,8 @@ def main() -> None:
 
     for file_name in listdir(DATA_DIR):
         csv = read_csv(DATA_DIR + file_name, delimiter=",")
-        dataset = file_name.replace(".csv", "")
 
-        if dataset == "bits":
+        if file_name == "bits.csv":
             csv = csv.set_index("length").map(lambda x: x / 8)
 
             csv.plot(title=f"Bytes used")
@@ -33,22 +32,16 @@ def main() -> None:
 
             print(f"saved bytes graph")
         else:
+            dataset = file_name.replace(".csv", "")
             average_times: DataFrame = csv.groupby(["length"]).mean().map(lambda x: x / 1000)
-            a, b = ("encode", "decode") if dataset == "huffman" else ("compress", "decompress")
 
-            average_times[a].plot(title=f"Average {a} time for {dataset}")
+            average_times.plot(title=f"Average times {dataset.replace("_", " ")}")
             plt.grid(axis="y")
             plt.ylabel("microseconds")
-            plt.savefig(f"{GRAPHS_DIR}times_{dataset}_{a}.png", dpi=300)
+            plt.savefig(f"{GRAPHS_DIR}{dataset}.png", dpi=300)
             plt.close()
 
-            average_times[b].plot(title=f"Average {b} time for {dataset}")
-            plt.grid(axis="y")
-            plt.ylabel("microseconds")
-            plt.savefig(f"{GRAPHS_DIR}times_{dataset}_{b}.png", dpi=300)
-            plt.close()
-
-            print(f"saved {dataset} times graphs")
+            print(f"saved {dataset} graphs")
 
 
 if __name__ == "__main__":

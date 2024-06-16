@@ -20,11 +20,10 @@ int main() {
 
     huffman warmup;
     warmup.decode(warmup.encode("warmup"));
-    warmup.~huffman();
 
     lempel_ziv::decompress(lempel_ziv::compress("warmup"));
 
-    pair<string, function<char()>> test_params[] = {
+    const pair<string, function<char()>> test_params[] = {
             {"randomized",  random_char_gen(1)},
             {"lorem_ipsum", lorem_ipsum_supplier()},
     };

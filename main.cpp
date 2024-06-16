@@ -29,17 +29,18 @@ int main() {
     };
 
     for (const auto &[name, generator]: test_params) {
-        stringstream out_hm, out_lz;
+        stringstream out_hm_times, out_lz_times, out_bits;
         string input;
         performance p;
 
-        out_hm << "length,encode_t,decode_t,bits\n";
-        out_lz << "length,compress_t,decompress_t,bits\n";
+        out_hm_times << "length,encode_t,decode_t\n";
+        out_lz_times << "length,compress_t,decompress_t\n";
+        out_bits << "length,huffman,lempel-ziv\n";
 
         for (int length = 1; length <= 1000; length++) {
             input += generator();
 
-            for (int _ = 0; _ < 50; ++_) {
+            for (int i = 0; i < 50; i++) {
                 huffman h;
 
                 p.start();
@@ -58,26 +59,33 @@ int main() {
                 lempel_ziv::decompress(compressed);
                 const uint64 decompress_time = p.end();
 
-                out_hm << length << ","
-                       << encode_time << ","
-                       << decode_time << ","
-                       << encoded.length() << "\n";
+                out_hm_times << length << ","
+                             << encode_time << ","
+                             << decode_time << "\n";
 
-                out_lz << length << ","
-                       << compress_time << ","
-                       << decompress_time << ","
-                       << compressed.size() * 8 << "\n";
+                out_lz_times << length << ","
+                             << compress_time << ","
+                             << decompress_time << "\n";
+
+                if (i == 0) {
+                    out_bits << length << ","
+                             << encoded.length() << ","
+                             << compressed.size() * 8 << "\n";
+                }
             }
         }
 
-        ofstream file_hm("data/huffman_" + name + ".csv");
-        ofstream file_lz("data/lempel_ziv_" + name + ".csv");
+        ofstream file_hm_times("data/huffman_" + name + ".csv");
+        ofstream file_lz_times("data/lempel_ziv_" + name + ".csv");
+        ofstream file_bits("data/bits_" + name + ".csv");
 
-        file_hm << out_hm.rdbuf();
-        file_lz << out_lz.rdbuf();
+        file_hm_times << out_hm_times.rdbuf();
+        file_lz_times << out_lz_times.rdbuf();
+        file_bits << out_bits.rdbuf();
 
-        file_hm.close();
-        file_lz.close();
+        file_hm_times.close();
+        file_lz_times.close();
+        file_bits.close();
     }
 
     return 0;

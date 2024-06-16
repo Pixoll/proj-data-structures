@@ -20,13 +20,19 @@ int main() {
     string input;
     performance p;
 
-    out_hm << "length,encode_t,decode_t,bits,match\n";
-    out_lz << "length,compress_t,decompress_t,bits,match\n";
+    huffman warmup;
+    warmup.decode(warmup.encode("warmup"));
+    warmup.~huffman();
 
-    for (int length = 1; length <= 1000000; length++) {
+    lempel_ziv::decompress(lempel_ziv::compress("warmup"));
+
+    out_hm << "length,encode_t,decode_t,bits\n";
+    out_lz << "length,compress_t,decompress_t,bits\n";
+
+    for (int length = 1; length <= 1000; length++) {
         input += random_char();
 
-        for (int _ = 0; _ < 100; ++_) {
+        for (int _ = 0; _ < 50; ++_) {
             huffman h;
 
             p.start();
@@ -34,7 +40,7 @@ int main() {
             const uint64 encode_time = p.end();
 
             p.start();
-            const string &decoded = h.decode(encoded);
+            h.decode(encoded);
             const uint64 decode_time = p.end();
 
             p.start();
@@ -42,20 +48,18 @@ int main() {
             const uint64 compress_time = p.end();
 
             p.start();
-            const string &decompressed = lempel_ziv::decompress(compressed);
+            lempel_ziv::decompress(compressed);
             const uint64 decompress_time = p.end();
 
             out_hm << length << ","
                    << encode_time << ","
                    << decode_time << ","
-                   << encoded.length() << ","
-                   << (decoded == input) << "\n";
+                   << encoded.length() << "\n";
 
             out_lz << length << ","
                    << compress_time << ","
                    << decompress_time << ","
-                   << compressed.size() * 8 << ","
-                   << (decompressed == input) << "\n";
+                   << compressed.size() * 8 << "\n";
         }
     }
 

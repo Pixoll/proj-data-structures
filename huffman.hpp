@@ -105,6 +105,16 @@ private:
         for (auto [data, freq]: frequencies)
             min_heap.push(new min_heap_node(data, freq));
 
+        if (min_heap.size() == 1) {
+            left = min_heap.top();
+            min_heap.pop();
+
+            top = new min_heap_node(min_heap_node::special_value, left->freq);
+            top->left = left;
+
+            return top;
+        }
+
         while (min_heap.size() != 1) {
             left = min_heap.top();
             min_heap.pop();

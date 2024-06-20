@@ -34,7 +34,7 @@ public:
     void insert(const string &string, uint64 start, uint64 length) {
         trie_node *current = this->root;
 
-        for (uint64 i = start; i < start + length; ++i) {
+        for (uint64 i = start; i < start + length; i++) {
             char c = string[i];
             if (current->children[c] == nullptr)
                 current->children[c] = new trie_node();
@@ -51,7 +51,7 @@ public:
         uint64 max_length = 0;
         uint64 position = -1;
 
-        for (uint64 i = start; i < string.size(); ++i) {
+        for (uint64 i = start; i < string.size(); i++) {
             char c = string[i];
             if (current->children[c] == nullptr)
                 break;

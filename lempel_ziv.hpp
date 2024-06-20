@@ -48,7 +48,7 @@ public:
             }
 
             positions.insert(i);
-            for (int j = 1; j < max_length; ++j)
+            for (int j = 1; j < max_length; j++)
                 chars[input[i + j]].insert(i + j);
 
             compressed.emplace_back(chosen_position, max_length);

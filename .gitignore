@@ -1,5 +1,5 @@
 /.idea
 /cmake-build-*
-/data
-/graphs
+/data*
+/graphs*
 /*.exe

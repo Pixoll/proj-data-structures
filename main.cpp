@@ -7,7 +7,6 @@
 #include <iostream>
 #include <filesystem>
 #include <functional>
-#include <fstream>
 #include <sstream>
 #include <string>
 
@@ -23,7 +22,7 @@ int main(const int argc, const char *argv[]) {
     filesystem::create_directory("data");
     filesystem::create_directory("output");
 
-    huffman::decode(huffman::encode("tangananica-tangananab"));
+    huffman::decode(huffman::encode("tangananica-tanganana"));
     lempel_ziv::decompress(lempel_ziv::compress("tangananica-tanganana"));
     lempel_ziv_fast::decompress(lempel_ziv_fast::compress("tangananica-tanganana"));
 
@@ -87,41 +86,30 @@ int main(const int argc, const char *argv[]) {
                          << decompress_fast_time << "\n";
 
             if (i == 0) {
-                const long long frequency_table_size = get<3>(encoded).size() * 9; // NOLINT(*-narrowing-conversions)
-                const long long encoded_bitstream_size = get<4>(encoded).size(); // NOLINT(*-narrowing-conversions)
+                const long long encoded_size = huffman::frequencies_offset // NOLINT(*-narrowing-conversions)
+                                               + get<3>(encoded).size() * sizeof(huffman::frequency_pair_t)
+                                               + get<4>(encoded).size();
                 const long long compressed_size = compressed.size() * 8; // NOLINT(*-narrowing-conversions)
                 const long long compressed_fast_size = compressed_fast.size() * 8; // NOLINT(*-narrowing-conversions)
 
                 out_bits << length << ","
-                         << 17 + frequency_table_size + encoded_bitstream_size << ","
+                         << encoded_size << ","
                          << compressed_size << ","
                          << compressed_fast_size << "\n";
 
-                ofstream file_encoded(
-                        "output/encoded_" + to_string(test) + ".bin",
-                        ios::out | ios::binary
+                huffman::write_encoded_to_file(
+                        encoded,
+                        "output/encoded_" + to_string(test) + ".bin"
                 );
-                ofstream file_compressed(
-                        "output/compressed_" + to_string(test) + ".bin",
-                        ios::out | ios::binary
+                lempel_ziv::write_compressed_to_file(
+                        compressed,
+                        "output/compressed_" + to_string(test) + ".bin"
                 );
-                ofstream file_compressed_fast(
-                        "output/compressed_fast_" + to_string(test) + ".bin",
-                        ios::out | ios::binary
+                lempel_ziv_fast::write_compressed_to_file(
+                        compressed_fast,
+
+                        "output/compressed_fast_" + to_string(test) + ".bin"
                 );
-
-                file_encoded.write(reinterpret_cast<const char *>(&get<0>(encoded)), 8);
-                file_encoded.write(reinterpret_cast<const char *>(&get<1>(encoded)), 8);
-                file_encoded.write(reinterpret_cast<const char *>(&get<2>(encoded)), 1);
-                file_encoded.write(reinterpret_cast<const char *>(&get<3>(encoded)[0]), frequency_table_size);
-                file_encoded.write(reinterpret_cast<const char *>(&get<4>(encoded)[0]), encoded_bitstream_size);
-                file_encoded.close();
-
-                file_compressed.write(reinterpret_cast<const char *>(&compressed[0]), compressed_size);
-                file_compressed.close();
-
-                file_compressed_fast.write(reinterpret_cast<const char *>(&compressed_fast[0]), compressed_fast_size);
-                file_compressed_fast.close();
             }
         }
     }

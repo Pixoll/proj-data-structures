@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cmath>
 #include <iostream>
+#include <fstream>
 #include <queue>
 #include <stack>
 #include <string>
@@ -41,7 +43,9 @@ public:
     ~huffman() = default;
 
     static const int frequencies_offset = sizeof(int) * 2 + sizeof(char);
-    typedef tuple<int, int, char, vector<pair<char, int>>, vector<unsigned char>> encoded_t;
+
+    typedef pair<char, int> frequency_pair_t;
+    typedef tuple<int, int, char, vector<frequency_pair_t>, vector<unsigned char>> encoded_t;
 
     static encoded_t encode(const string &input) {
         unordered_map<char, int> frequency_map;
@@ -49,7 +53,7 @@ public:
             frequency_map[c]++;
 
         const int unique_chars = frequency_map.size();
-        vector<pair<char, int>> frequency_table;
+        vector<frequency_pair_t> frequency_table;
         frequency_table.reserve(unique_chars);
         for (const auto &[c, f]: frequency_map)
             frequency_table.emplace_back(c, f);
@@ -132,8 +136,59 @@ public:
         return decoded;
     }
 
+    static void write_encoded_to_file(const encoded_t &encoded, const string &file_name) {
+        ofstream file(file_name, ios::out | ios::binary);
+
+        file.write(reinterpret_cast<const char *>(&get<0>(encoded)), sizeof(get<0>(encoded)));
+        file.write(reinterpret_cast<const char *>(&get<1>(encoded)), sizeof(get<1>(encoded)));
+        file.write(reinterpret_cast<const char *>(&get<2>(encoded)), sizeof(get<2>(encoded)));
+
+        for (const auto &[c, f]: get<3>(encoded)) {
+            file.write(&c, sizeof(c));
+            file.write(reinterpret_cast<const char *>(&f), sizeof(f));
+        }
+
+        for (const auto &b: get<4>(encoded))
+            file.write(reinterpret_cast<const char *>(&b), sizeof(b));
+
+        file.close();
+    }
+
+    static encoded_t read_encoded_from_file(const string &file_name) {
+        huffman::encoded_t encoded;
+
+        ifstream file(file_name, ios::in | ios::binary);
+
+        file.read(reinterpret_cast<char *>(&get<0>(encoded)), sizeof(get<0>(encoded)));
+        file.read(reinterpret_cast<char *>(&get<1>(encoded)), sizeof(get<1>(encoded)));
+        file.read(reinterpret_cast<char *>(&get<2>(encoded)), sizeof(get<2>(encoded)));
+
+        const int unique_chars = get<0>(encoded);
+        get<3>(encoded).reserve(unique_chars);
+
+        for (int _ = 0; _ < unique_chars; _++) {
+            huffman::frequency_pair_t frequency_pair;
+            file.read(&frequency_pair.first, sizeof(frequency_pair.first));
+            file.read(reinterpret_cast<char *>(&frequency_pair.second), sizeof(frequency_pair.second));
+            get<3>(encoded).emplace_back(frequency_pair);
+        }
+
+        const int bytes = ceil(float(get<1>(encoded) * 8 + get<2>(encoded)) / 8);
+        get<4>(encoded).reserve(bytes);
+
+        for (int _ = 0; _ < bytes; _++) {
+            unsigned char byte;
+            file.read(reinterpret_cast<char *>(&byte), sizeof(byte));
+            get<4>(encoded).push_back(byte);
+        }
+
+        file.close();
+
+        return encoded;
+    }
+
 private:
-    static min_heap_node *make_min_heap(const vector<pair<char, int>> &frequency_table) {
+    static min_heap_node *make_min_heap(const vector<frequency_pair_t> &frequency_table) {
         min_heap_node *left, *right, *top;
         priority_queue<min_heap_node *, vector<min_heap_node *>, min_heap_node::compare> min_heap;
 
@@ -167,16 +222,16 @@ private:
         return min_heap.top();
     }
 
-//    static void print_tree(const string &prefix, const min_heap_node *node, bool isLeft) {
+//    static void print_tree(const string &prefix, const min_heap_node *node, bool is_left) {
 //        if (node == nullptr)
 //            return;
 //
 //        cout << prefix
-//             << (isLeft ? "├──" : "└──")
+//             << (is_left ? "├──" : "└──")
 //             << "(" << int(node->data) << "," << node->freq << ")" << endl;
 //
-//        print_tree(prefix + (isLeft ? "│   " : "    "), node->left, true);
-//        print_tree(prefix + (isLeft ? "│   " : "    "), node->right, false);
+//        print_tree(prefix + (is_left ? "│   " : "    "), node->left, true);
+//        print_tree(prefix + (is_left ? "│   " : "    "), node->right, false);
 //    }
 //
 //    static void print_tree(const min_heap_node *node) {

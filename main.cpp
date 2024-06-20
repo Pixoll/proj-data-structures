@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 int main(const int argc, const char *argv[]) {
     if (filesystem::exists("data"))
         filesystem::remove_all("data");
@@ -86,11 +88,11 @@ int main(const int argc, const char *argv[]) {
                          << decompress_fast_time << "\n";
 
             if (i == 0) {
-                const long long encoded_size = huffman::frequencies_offset // NOLINT(*-narrowing-conversions)
+                const long long encoded_size = huffman::frequencies_offset
                                                + get<3>(encoded).size() * sizeof(huffman::frequency_pair_t)
                                                + get<4>(encoded).size();
-                const long long compressed_size = compressed.size() * 8; // NOLINT(*-narrowing-conversions)
-                const long long compressed_fast_size = compressed_fast.size() * 8; // NOLINT(*-narrowing-conversions)
+                const long long compressed_size = compressed.size() * sizeof(lempel_ziv::compressed_pair_t);
+                const long long compressed_fast_size = compressed_fast.size() * sizeof(lempel_ziv_fast::compressed_pair_t);
 
                 out_bits << length << ","
                          << encoded_size << ","
@@ -128,3 +130,4 @@ int main(const int argc, const char *argv[]) {
 
     return 0;
 }
+#pragma clang diagnostic pop

@@ -5,9 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(proj_data_structures main.cpp
         huffman.hpp
-        lempel_ziv.hpp
         performance.hpp
         lorem_ipsum_supplier.hpp
         trie.hpp
         lempel_ziv_fast.hpp
+        lempel_ziv_gfg.hpp
 )

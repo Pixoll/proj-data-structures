@@ -1,6 +1,6 @@
 #include "huffman.hpp"
-#include "lempel_ziv.hpp"
 #include "lempel_ziv_fast.hpp"
+#include "lempel_ziv_gfg.hpp"
 #include "lorem_ipsum_supplier.hpp"
 #include "performance.hpp"
 
@@ -14,6 +14,7 @@ using namespace std;
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
+
 int main(const int argc, const char *argv[]) {
     if (filesystem::exists("data"))
         filesystem::remove_all("data");
@@ -25,12 +26,12 @@ int main(const int argc, const char *argv[]) {
     filesystem::create_directory("output");
 
     huffman::decode(huffman::encode("tangananica-tanganana"));
-    lempel_ziv::decompress(lempel_ziv::compress("tangananica-tanganana"));
     lempel_ziv_fast::decompress(lempel_ziv_fast::compress("tangananica-tanganana"));
+    lempel_ziv_gfg::decompress(lempel_ziv_gfg::compress("tangananica-tanganana"));
 
     const int tests = argc > 1 ? strtol(argv[1], nullptr, 10) : 100;
     const int length_step = argc > 2 ? strtol(argv[2], nullptr, 10) : 100;
-    const int max_iterations = argc > 3 ? strtol(argv[3], nullptr, 10) : 20;
+    const int max_iterations = argc > 3 ? strtol(argv[3], nullptr, 10) : 1;
 
     const int max_length = length_step * tests;
 
@@ -39,9 +40,9 @@ int main(const int argc, const char *argv[]) {
     string input;
     performance p;
 
-    out_e_vs_c << "length,huffman,lempel-ziv greedy,lempel-ziv fast\n";
-    out_de_vs_dc << "length,huffman,lempel-ziv greedy,lempel-ziv fast\n";
-    out_bits << "length,huffman,lempel-ziv greedy,lempel-ziv fast\n";
+    out_e_vs_c << "length,huffman,lempel-ziv fast,lempel-ziv gfg\n";
+    out_de_vs_dc << "length,huffman,lempel-ziv fast,lempel-ziv gfg\n";
+    out_bits << "length,huffman,lempel-ziv fast,lempel-ziv gfg\n";
 
     int last_length = 0;
     for (int length = length_step; length <= max_length; length += length_step) {
@@ -58,60 +59,60 @@ int main(const int argc, const char *argv[]) {
             const huffman::encoded_t encoded = huffman::encode(input);
             const uint64_t encode_time = p.end();
 
-            huffman::decode(encoded);
+            const string &decoded = huffman::decode(encoded);
             const uint64_t decode_time = p.end();
-
-            p.start();
-            const lempel_ziv::compressed_t &compressed = lempel_ziv::compress(input);
-            const uint64_t compress_time = p.end();
-
-            p.start();
-            lempel_ziv::decompress(compressed);
-            const uint64_t decompress_time = p.end();
 
             p.start();
             const lempel_ziv_fast::compressed_t &compressed_fast = lempel_ziv_fast::compress(input);
             const uint64_t compress_fast_time = p.end();
 
             p.start();
-            lempel_ziv_fast::decompress(compressed_fast);
+            const string &decompressed_fast = lempel_ziv_fast::decompress(compressed_fast);
             const uint64_t decompress_fast_time = p.end();
+
+            p.start();
+            const lempel_ziv_gfg::compressed_t &compressed_gfg = lempel_ziv_gfg::compress(input);
+            const uint64_t compress_gfg_time = p.end();
+
+            p.start();
+            const string &decompressed_gfg = lempel_ziv_gfg::decompress(compressed_gfg);
+            const uint64_t decompress_gfg_time = p.end();
 
             out_e_vs_c << length << ","
                        << encode_time << ","
-                       << compress_time << ","
-                       << compress_fast_time << "\n";
+                       << compress_fast_time << ","
+                       << compress_gfg_time << "\n";
 
             out_de_vs_dc << length << ","
                          << decode_time << ","
-                         << decompress_time << ","
-                         << decompress_fast_time << "\n";
+                         << decompress_fast_time << ","
+                         << decompress_gfg_time << "\n";
 
             if (i == 0) {
+                cout << "huffman: " << (decoded == input ? "true" : "false") << "\n"
+                     << "lz fast: " << (decompressed_fast == input ? "true" : "false") << "\n"
+                     << "lz gfg: " << (decompressed_gfg == input ? "true" : "false") << "\n";
+
                 const long long encoded_size = huffman::frequencies_offset
                                                + get<3>(encoded).size() * sizeof(huffman::frequency_pair_t)
                                                + get<4>(encoded).size();
-                const long long compressed_size = compressed.size() * sizeof(lempel_ziv::compressed_pair_t);
-                const long long compressed_fast_size = compressed_fast.size() * sizeof(lempel_ziv_fast::compressed_pair_t);
+                const long long compressed_fast_size = compressed_fast.size() * sizeof(compressed_fast[0]);
+                const long long compressed_gfg_size = compressed_gfg.size() * sizeof(compressed_gfg[0]);
 
                 out_bits << length << ","
                          << encoded_size << ","
-                         << compressed_size << ","
-                         << compressed_fast_size << "\n";
+                         << compressed_fast_size << ","
+                         << compressed_gfg_size << "\n";
 
-                huffman::write_encoded_to_file(
-                        encoded,
-                        "output/encoded_" + to_string(test) + ".bin"
-                );
-                lempel_ziv::write_compressed_to_file(
-                        compressed,
-                        "output/compressed_" + to_string(test) + ".bin"
-                );
-                lempel_ziv_fast::write_compressed_to_file(
-                        compressed_fast,
-
-                        "output/compressed_fast_" + to_string(test) + ".bin"
-                );
+//                huffman::write_encoded_to_file(
+//                        encoded,
+//                        "output/encoded_" + to_string(test) + ".bin"
+//                );
+//                lempel_ziv_fast::write_compressed_to_file(
+//                        compressed_fast,
+//
+//                        "output/compressed_fast_" + to_string(test) + ".bin"
+//                );
             }
         }
     }
@@ -130,4 +131,5 @@ int main(const int argc, const char *argv[]) {
 
     return 0;
 }
+
 #pragma clang diagnostic pop

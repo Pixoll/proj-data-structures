@@ -52,7 +52,7 @@ public:
         for (const char c: input)
             frequency_map[c]++;
 
-        const int unique_chars = frequency_map.size();
+        const int unique_chars = frequency_map.size(); // NOLINT(*-narrowing-conversions)
         vector<frequency_pair_t> frequency_table;
         frequency_table.reserve(unique_chars);
         for (const auto &[c, f]: frequency_map)
@@ -77,27 +77,28 @@ public:
                 code_stack.emplace(node->left, code + "0");
         }
 
-        int bytes = 0;
+        unsigned char byte = 0;
         int bits = 0;
-        vector<unsigned char> encoded_data(1, 0);
+        vector<unsigned char> encoded_data;
 
         for (const char c: input) {
             for (const char b: encode_map[c]) {
-                const int bit = b == '1' ? 1 : 0;
-                encoded_data[bytes] |= bit << 7;
+                byte = (byte << 1) | (b - '0');
 
                 if (++bits == 8) {
+                    encoded_data.push_back(byte);
+                    byte = 0;
                     bits = 0;
-                    bytes++;
-                    encoded_data.push_back(0);
-                } else {
-                    encoded_data[bytes] >>= 1;
                 }
             }
         }
 
-        if (bits == 0)
-            encoded_data.resize(bytes);
+        const int bytes = encoded_data.size(); // NOLINT(*-narrowing-conversions)
+
+        if (bits > 0) {
+            byte <<= (8 - bits);
+            encoded_data.push_back(byte);
+        }
 
         delete tree;
 
@@ -114,18 +115,18 @@ public:
 
         int bytes = 0;
 
-        for (const unsigned char c: encoded_data) {
-            for (int i = 0; i < 8; i++) {
-                if (bytes == max_bytes && i > last_bit)
-                    break;
-
-                const int bit = c & (1 << i);
+        for (const unsigned char byte: encoded_data) {
+            for (int i = 7; i >= 0; i--) {
+                const int bit = (byte >> i) & 1;
                 node = bit == 0 ? node->left : node->right;
 
                 if (node->left == nullptr && node->right == nullptr) {
                     decoded += node->data;
                     node = tree;
                 }
+
+                if (bytes == max_bytes && 7 - i == last_bit - 1)
+                    break;
             }
 
             bytes++;

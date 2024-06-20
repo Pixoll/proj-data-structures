@@ -75,10 +75,6 @@ public:
                 code_stack.emplace(node->left, code + "0");
         }
 
-        string a;
-        for (const char c: input)
-            a += encode_map[c];
-
         uint64 bytes = 0;
         int bits = 0;
         vector<unsigned char> encoded_data(1, 0);

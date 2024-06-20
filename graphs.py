@@ -20,8 +20,8 @@ def main() -> None:
     for file_name in listdir(DATA_DIR):
         csv = read_csv(DATA_DIR + file_name, delimiter=",")
 
-        if file_name == "bits.csv":
-            csv = csv.set_index("length").map(lambda x: x / 8)
+        if file_name == "bytes.csv":
+            csv = csv.set_index("length")
 
             csv.plot(title=f"Bytes used")
             plt.grid(axis="y")

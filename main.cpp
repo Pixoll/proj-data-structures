@@ -17,10 +17,13 @@ int main(const int argc, const char *argv[]) {
     if (filesystem::exists("data"))
         filesystem::remove_all("data");
 
-    filesystem::create_directory("data");
+    if (filesystem::exists("output"))
+        filesystem::remove_all("output");
 
-    huffman warmup;
-    warmup.decode(warmup.encode("tangananica-tanganana"));
+    filesystem::create_directory("data");
+    filesystem::create_directory("output");
+
+    huffman::decode(huffman::encode("tangananica-tangananab"));
     lempel_ziv::decompress(lempel_ziv::compress("tangananica-tanganana"));
     lempel_ziv_fast::decompress(lempel_ziv_fast::compress("tangananica-tanganana"));
 
@@ -41,7 +44,8 @@ int main(const int argc, const char *argv[]) {
 
     int last_length = 0;
     for (int length = length_step; length <= max_length; length += length_step) {
-        cout << "test " << length / length_step << endl;
+        const int test = length / length_step;
+        cout << "test " << test << endl;
 
         while (last_length < length) {
             input += lorem_ipsum();
@@ -49,14 +53,11 @@ int main(const int argc, const char *argv[]) {
         }
 
         for (int i = 0; i < max_iterations; i++) {
-            huffman h;
-
             p.start();
-            const string &encoded = h.encode(input);
+            const huffman::encoded_t encoded = huffman::encode(input);
             const uint64 encode_time = p.end();
 
-            p.start();
-            h.decode(encoded);
+            huffman::decode(encoded);
             const uint64 decode_time = p.end();
 
             p.start();
@@ -86,17 +87,48 @@ int main(const int argc, const char *argv[]) {
                          << decompress_fast_time << "\n";
 
             if (i == 0) {
+                const long long frequency_table_size = get<3>(encoded).size() * 9; // NOLINT(*-narrowing-conversions)
+                const long long encoded_bitstream_size = get<4>(encoded).size(); // NOLINT(*-narrowing-conversions)
+                const long long compressed_size = compressed.size() * 8; // NOLINT(*-narrowing-conversions)
+                const long long compressed_fast_size = compressed_fast.size() * 8; // NOLINT(*-narrowing-conversions)
+
                 out_bits << length << ","
-                         << encoded.length() << ","
-                         << compressed.size() * 8 << ","
-                         << compressed_fast.size() * 8 << "\n";
+                         << 17 + frequency_table_size + encoded_bitstream_size << ","
+                         << compressed_size << ","
+                         << compressed_fast_size << "\n";
+
+                ofstream file_encoded(
+                        "output/encoded_" + to_string(test) + ".bin",
+                        ios::out | ios::binary
+                );
+                ofstream file_compressed(
+                        "output/compressed_" + to_string(test) + ".bin",
+                        ios::out | ios::binary
+                );
+                ofstream file_compressed_fast(
+                        "output/compressed_fast_" + to_string(test) + ".bin",
+                        ios::out | ios::binary
+                );
+
+                file_encoded.write(reinterpret_cast<const char *>(&get<0>(encoded)), 8);
+                file_encoded.write(reinterpret_cast<const char *>(&get<1>(encoded)), 8);
+                file_encoded.write(reinterpret_cast<const char *>(&get<2>(encoded)), 1);
+                file_encoded.write(reinterpret_cast<const char *>(&get<3>(encoded)[0]), frequency_table_size);
+                file_encoded.write(reinterpret_cast<const char *>(&get<4>(encoded)[0]), encoded_bitstream_size);
+                file_encoded.close();
+
+                file_compressed.write(reinterpret_cast<const char *>(&compressed[0]), compressed_size);
+                file_compressed.close();
+
+                file_compressed_fast.write(reinterpret_cast<const char *>(&compressed_fast[0]), compressed_fast_size);
+                file_compressed_fast.close();
             }
         }
     }
 
     ofstream file_e_vs_c("data/encode_vs_compress.csv");
     ofstream file_de_vs_dc("data/decode_vs_decompress.csv");
-    ofstream file_bits("data/bits.csv");
+    ofstream file_bits("data/bytes.csv");
 
     file_e_vs_c << out_e_vs_c.rdbuf();
     file_de_vs_dc << out_de_vs_dc.rdbuf();

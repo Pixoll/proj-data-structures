@@ -5,6 +5,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <unordered_map>
 
 using namespace std;
@@ -36,24 +37,29 @@ private:
         };
     };
 
-    min_heap_node *tree_root = nullptr;
-
 public:
     huffman() = default;
 
-    ~huffman() {
-        delete this->tree_root;
-    }
+    ~huffman() = default;
 
-    string encode(const string &input) {
-        unordered_map<char, uint64> frequencies;
+    static const int frequencies_offset = sizeof(uint64) * 2 + sizeof(char);
+    typedef tuple<uint64, uint64, char, vector<pair<char, uint64>>, vector<unsigned char>> encoded_t;
+
+    static encoded_t encode(const string &input) {
+        unordered_map<char, uint64> frequency_map;
         for (const char c: input)
-            frequencies[c]++;
+            frequency_map[c]++;
 
-        this->tree_root = make_min_heap(frequencies);
+        const uint64 unique_chars = frequency_map.size();
+        vector<pair<char, uint64>> frequency_table;
+        frequency_table.reserve(unique_chars);
+        for (const auto &[c, f]: frequency_map)
+            frequency_table.emplace_back(c, f);
+
+        min_heap_node *tree = make_min_heap(frequency_table);
         unordered_map<char, string> encode_map;
         stack<pair<min_heap_node *, string>> code_stack;
-        code_stack.emplace(this->tree_root, "");
+        code_stack.emplace(tree, "");
 
         while (!code_stack.empty()) {
             auto [node, code] = code_stack.top();
@@ -69,40 +75,75 @@ public:
                 code_stack.emplace(node->left, code + "0");
         }
 
-        string encoded_data;
+        string a;
         for (const char c: input)
-            encoded_data += encode_map[c];
+            a += encode_map[c];
 
-        return encoded_data;
-    }
+        uint64 bytes = 0;
+        int bits = 0;
+        vector<unsigned char> encoded_data(1, 0);
 
-    string decode(const string &encoded) {
-        if (this->tree_root == nullptr) {
-            cerr << "huffman: encode something first" << endl;
-            exit(1);
-        }
+        for (const char c: input) {
+            for (const char b: encode_map[c]) {
+                const int bit = b == '1' ? 1 : 0;
+                encoded_data[bytes] |= bit << 7;
 
-        string decoded;
-        min_heap_node *node = this->tree_root;
-
-        for (const char c: encoded) {
-            node = c == '0' ? node->left : node->right;
-
-            if (node->left == nullptr && node->right == nullptr) {
-                decoded += node->data;
-                node = this->tree_root;
+                if (++bits == 8) {
+                    bits = 0;
+                    bytes++;
+                    encoded_data.push_back(0);
+                } else {
+                    encoded_data[bytes] >>= 1;
+                }
             }
         }
+
+        if (bits == 0)
+            encoded_data.resize(bytes);
+
+        delete tree;
+
+        return {unique_chars, bytes, bits, frequency_table, encoded_data};
+    }
+
+    static string decode(const encoded_t &encoded) {
+        const auto &[_, max_bytes, last_bit, frequency_table, encoded_data] = encoded;
+
+        min_heap_node *tree = make_min_heap(frequency_table);
+
+        string decoded;
+        min_heap_node *node = tree;
+
+        uint64 bytes = 0;
+
+        for (const unsigned char c: encoded_data) {
+            for (int i = 0; i < 8; i++) {
+                if (bytes == max_bytes && i > last_bit)
+                    break;
+
+                const int bit = c & (1 << i);
+                node = bit == 0 ? node->left : node->right;
+
+                if (node->left == nullptr && node->right == nullptr) {
+                    decoded += node->data;
+                    node = tree;
+                }
+            }
+
+            bytes++;
+        }
+
+        delete tree;
 
         return decoded;
     }
 
 private:
-    static min_heap_node *make_min_heap(const unordered_map<char, uint64> &frequencies) {
+    static min_heap_node *make_min_heap(const vector<pair<char, uint64>> &frequency_table) {
         min_heap_node *left, *right, *top;
         priority_queue<min_heap_node *, vector<min_heap_node *>, min_heap_node::compare> min_heap;
 
-        for (auto [data, freq]: frequencies)
+        for (auto [data, freq]: frequency_table)
             min_heap.push(new min_heap_node(data, freq));
 
         if (min_heap.size() == 1) {
@@ -131,4 +172,21 @@ private:
 
         return min_heap.top();
     }
+
+//    static void print_tree(const string &prefix, const min_heap_node *node, bool isLeft) {
+//        if (node == nullptr)
+//            return;
+//
+//        cout << prefix
+//             << (isLeft ? "├──" : "└──")
+//             << "(" << int(node->data) << "," << node->freq << ")" << endl;
+//
+//        print_tree(prefix + (isLeft ? "│   " : "    "), node->left, true);
+//        print_tree(prefix + (isLeft ? "│   " : "    "), node->right, false);
+//    }
+//
+//    static void print_tree(const min_heap_node *node) {
+//        print_tree("", node, false);
+//        cout << endl;
+//    }
 };

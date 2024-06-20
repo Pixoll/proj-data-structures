@@ -11,13 +11,13 @@ using namespace std;
 
 class lempel_ziv_fast {
 public:
-    typedef vector<pair<uint64, uint64>> compressed_t;
+    typedef vector<pair<int, int>> compressed_t;
 
     static compressed_t compress(const string &input) {
         trie trie;
         compressed_t compressed;
 
-        for (uint64 i = 0; i < input.size();) {
+        for (int i = 0; i < input.size();) {
             auto [position, length] = trie.search(input, i);
 
             if (length == 0) {

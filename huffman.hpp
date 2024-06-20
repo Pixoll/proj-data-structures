@@ -10,8 +10,6 @@
 
 using namespace std;
 
-typedef unsigned long long uint64;
-
 class huffman {
 private:
     class min_heap_node {
@@ -19,11 +17,11 @@ private:
         static const char special_value = -1;
 
         const char data;
-        uint64 freq;
+        int freq;
         min_heap_node *left = nullptr;
         min_heap_node *right = nullptr;
 
-        min_heap_node(char data, uint64 freq) : data(data), freq(freq) {}
+        min_heap_node(char data, int freq) : data(data), freq(freq) {}
 
         ~min_heap_node() {
             delete this->left;
@@ -42,16 +40,16 @@ public:
 
     ~huffman() = default;
 
-    static const int frequencies_offset = sizeof(uint64) * 2 + sizeof(char);
-    typedef tuple<uint64, uint64, char, vector<pair<char, uint64>>, vector<unsigned char>> encoded_t;
+    static const int frequencies_offset = sizeof(int) * 2 + sizeof(char);
+    typedef tuple<int, int, char, vector<pair<char, int>>, vector<unsigned char>> encoded_t;
 
     static encoded_t encode(const string &input) {
-        unordered_map<char, uint64> frequency_map;
+        unordered_map<char, int> frequency_map;
         for (const char c: input)
             frequency_map[c]++;
 
-        const uint64 unique_chars = frequency_map.size();
-        vector<pair<char, uint64>> frequency_table;
+        const int unique_chars = frequency_map.size();
+        vector<pair<char, int>> frequency_table;
         frequency_table.reserve(unique_chars);
         for (const auto &[c, f]: frequency_map)
             frequency_table.emplace_back(c, f);
@@ -75,7 +73,7 @@ public:
                 code_stack.emplace(node->left, code + "0");
         }
 
-        uint64 bytes = 0;
+        int bytes = 0;
         int bits = 0;
         vector<unsigned char> encoded_data(1, 0);
 
@@ -110,7 +108,7 @@ public:
         string decoded;
         min_heap_node *node = tree;
 
-        uint64 bytes = 0;
+        int bytes = 0;
 
         for (const unsigned char c: encoded_data) {
             for (int i = 0; i < 8; i++) {
@@ -135,7 +133,7 @@ public:
     }
 
 private:
-    static min_heap_node *make_min_heap(const vector<pair<char, uint64>> &frequency_table) {
+    static min_heap_node *make_min_heap(const vector<pair<char, int>> &frequency_table) {
         min_heap_node *left, *right, *top;
         priority_queue<min_heap_node *, vector<min_heap_node *>, min_heap_node::compare> min_heap;
 

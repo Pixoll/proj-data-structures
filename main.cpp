@@ -55,26 +55,26 @@ int main(const int argc, const char *argv[]) {
         for (int i = 0; i < max_iterations; i++) {
             p.start();
             const huffman::encoded_t encoded = huffman::encode(input);
-            const uint64 encode_time = p.end();
+            const uint64_t encode_time = p.end();
 
             huffman::decode(encoded);
-            const uint64 decode_time = p.end();
+            const uint64_t decode_time = p.end();
 
             p.start();
             const lempel_ziv::compressed_t &compressed = lempel_ziv::compress(input);
-            const uint64 compress_time = p.end();
+            const uint64_t compress_time = p.end();
 
             p.start();
             lempel_ziv::decompress(compressed);
-            const uint64 decompress_time = p.end();
+            const uint64_t decompress_time = p.end();
 
             p.start();
             const lempel_ziv_fast::compressed_t &compressed_fast = lempel_ziv_fast::compress(input);
-            const uint64 compress_fast_time = p.end();
+            const uint64_t compress_fast_time = p.end();
 
             p.start();
             lempel_ziv_fast::decompress(compressed_fast);
-            const uint64 decompress_fast_time = p.end();
+            const uint64_t decompress_fast_time = p.end();
 
             out_e_vs_c << length << ","
                        << encode_time << ","

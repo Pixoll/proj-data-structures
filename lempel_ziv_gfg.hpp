@@ -85,4 +85,10 @@ public:
         file.write(reinterpret_cast<const char *>(compressed.data()), compressed.size() * sizeof(compressed[0]));
         file.close();
     }
+
+    static void write_decompressed_to_file(const string &decompressed, const string &file_name) {
+        ofstream file(file_name, ios::out | ios::binary);
+        file.write(decompressed.data(), decompressed.length());
+        file.close();
+    }
 };

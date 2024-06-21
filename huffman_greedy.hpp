@@ -188,6 +188,12 @@ public:
         return encoded;
     }
 
+    static void write_decoded_to_file(const string &decoded, const string &file_name) {
+        ofstream file(file_name, ios::out | ios::binary);
+        file.write(decoded.data(), decoded.length());
+        file.close();
+    }
+
 private:
     static min_heap_node *make_min_heap(const vector<frequency_pair_t> &frequency_table) {
         min_heap_node *left, *right, *top;

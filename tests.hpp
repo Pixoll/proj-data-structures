@@ -14,12 +14,15 @@
 
 using namespace std;
 
+string get_file_ext(const string &file_name);
+
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 
 void run_tests(const string &name, const string &input_file_name, int tests, int length_step, int max_iterations) {
     cout << "running " << name << " tests" << endl;
 
+    const string &extension = get_file_ext(input_file_name);
     performance p, total;
     char_supplier supplier(input_file_name);
     stringstream out_e_vs_c, out_de_vs_dc, out_bits;
@@ -46,11 +49,11 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
 
         for (int i = 0; i < max_iterations; i++) {
             p.start();
-            const huffman_greedy::encoded_t encoded = huffman_greedy::encode(input);
-            const uint64_t encode_time = p.end();
+            const huffman_greedy::encoded_t encoded_greedy = huffman_greedy::encode(input);
+            const uint64_t encode_greedy_time = p.end();
 
-            const string &decoded = huffman_greedy::decode(encoded);
-            const uint64_t decode_time = p.end();
+            const string &decoded_greedy = huffman_greedy::decode(encoded_greedy);
+            const uint64_t decode_greedy_time = p.end();
 
             p.start();
             const lempel_ziv_gfg::compressed_t &compressed_gfg = lempel_ziv_gfg::compress(input);
@@ -61,43 +64,44 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
             const uint64_t decompress_gfg_time = p.end();
 
             out_e_vs_c << length << ","
-                       << encode_time << ","
+                       << encode_greedy_time << ","
                        << compress_gfg_time << "\n";
 
             out_de_vs_dc << length << ","
-                         << decode_time << ","
+                         << decode_greedy_time << ","
                          << decompress_gfg_time << "\n";
 
             if (i == 0) {
-                cout << "huffman greedy: " << (decoded == input ? "true" : "false") << "\n"
-                     << "lz gfg: " << (decompressed_gfg == input ? "true" : "false") << "\n";
+                cout << "huffman greedy: " << (decoded_greedy == input ? "true" : "false") << "\n"
+                     << "lempel-ziv gfg: " << (decompressed_gfg == input ? "true" : "false") << "\n";
 
-                const long long encoded_size = huffman_greedy::frequencies_offset
-                                               + get<3>(encoded).size() * sizeof(huffman_greedy::frequency_pair_t)
-                                               + get<4>(encoded).size();
+                const long long encoded_greedy_size = huffman_greedy::frequencies_offset
+                                                      + get<3>(encoded_greedy).size()
+                                                        * sizeof(huffman_greedy::frequency_pair_t)
+                                                      + get<4>(encoded_greedy).size();
                 const long long compressed_gfg_size = compressed_gfg.size() * sizeof(compressed_gfg[0]);
 
                 out_bits << length << ","
-                         << encoded_size << ","
+                         << encoded_greedy_size << ","
                          << compressed_gfg_size << "\n";
 
                 huffman_greedy::write_encoded_to_file(
-                        encoded,
-                        "output/" + name + "_encoded_" + to_string(test) + ".bin"
+                        encoded_greedy,
+                        "output/" + name + "_encoded_greedy_" + to_string(test) + ".bin"
                 );
+                huffman_greedy::write_decoded_to_file(
+                        decoded_greedy,
+                        "output/" + name + "_decoded_greedy_" + to_string(test) + "." + extension
+                );
+
                 lempel_ziv_gfg::write_compressed_to_file(
                         compressed_gfg,
-
                         "output/" + name + "_compressed_gfg_" + to_string(test) + ".bin"
                 );
-
-                ofstream file_1("output/decoded_" + input_file_name, ios::out | ios::binary);
-                file_1.write(decoded.data(), decoded.length());
-                file_1.close();
-
-                ofstream file_2("output/decompressed_" + input_file_name, ios::out | ios::binary);
-                file_2.write(decompressed_gfg.data(), decompressed_gfg.length());
-                file_2.close();
+                lempel_ziv_gfg::write_decompressed_to_file(
+                        decompressed_gfg,
+                        "output/" + name + "_decompressed_gfg_" + to_string(test) + "." + extension
+                );
             }
         }
     }
@@ -117,8 +121,17 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
     cout << "finished, took " << total.end<performance::milliseconds>() / 1e3 << " s\n" << endl;
 }
 
+#pragma clang diagnostic pop
+
 void run_tests(const string &name, const string &input_file_name, int iterations) {
     run_tests(name, input_file_name, 1, -1, iterations);
 }
 
-#pragma clang diagnostic pop
+string get_file_ext(const string &file_name) {
+    stringstream stream(file_name);
+    string extension;
+
+    while (getline(stream, extension, '.')) {}
+
+    return extension;
+}

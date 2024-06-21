@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include "char_supplier.hpp"
 #include "huffman_greedy.hpp"

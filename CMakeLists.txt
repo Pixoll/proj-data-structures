@@ -4,11 +4,9 @@ project(proj_data_structures)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(proj_data_structures main.cpp
-        huffman.hpp
+        huffman_greedy.hpp
         performance.hpp
-        lorem_ipsum_supplier.hpp
-        trie.hpp
-        lempel_ziv_fast.hpp
         lempel_ziv_gfg.hpp
         tests.hpp
+        char_supplier.hpp
 )

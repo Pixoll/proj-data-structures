@@ -19,7 +19,7 @@ string get_file_ext(const string &file_name);
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 
-void run_tests(const string &name, const string &input_file_name, int tests, int max_iterations) {
+void run_tests(const string &name, const string &input_file_name, int tests, int iterations) {
     cout << "running " << name << " tests" << endl;
 
 //    const string &extension = get_file_ext(input_file_name);
@@ -47,7 +47,7 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
             last_length++;
         }
 
-        for (int i = 0; i < max_iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             p.start();
             const huffman_greedy::encoded_t encoded_greedy = huffman_greedy::encode(input);
             const uint64_t encode_greedy_time = p.end();

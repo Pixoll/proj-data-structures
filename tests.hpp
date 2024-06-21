@@ -85,19 +85,19 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
                          << encoded_greedy_size << ","
                          << compressed_gfg_size << "\n";
 
-                huffman_greedy::write_encoded_to_file(
-                        encoded_greedy,
-                        "output/" + name + "_encoded_greedy_" + to_string(test) + ".bin"
-                );
+//                huffman_greedy::write_encoded_to_file(
+//                        encoded_greedy,
+//                        "output/" + name + "_encoded_greedy_" + to_string(test) + ".bin"
+//                );
 //                huffman_greedy::write_decoded_to_file(
 //                        decoded_greedy,
 //                        "output/" + name + "_decoded_greedy_" + to_string(test) + "." + extension
 //                );
 
-                lempel_ziv_gfg::write_compressed_to_file(
-                        compressed_gfg,
-                        "output/" + name + "_compressed_gfg_" + to_string(test) + ".bin"
-                );
+//                lempel_ziv_gfg::write_compressed_to_file(
+//                        compressed_gfg,
+//                        "output/" + name + "_compressed_gfg_" + to_string(test) + ".bin"
+//                );
 //                lempel_ziv_gfg::write_decompressed_to_file(
 //                        decompressed_gfg,
 //                        "output/" + name + "_decompressed_gfg_" + to_string(test) + "." + extension

@@ -19,30 +19,34 @@ def main() -> None:
 
     for file_name in listdir(DATA_DIR):
         csv = read_csv(DATA_DIR + file_name, delimiter=",")
+        dataset = file_name.split("_")[0]
 
-        if file_name == "bytes.csv":
-            csv = csv.set_index("length")
+        csv["length"] = csv["length"].map(lambda x: x / 1e6)
 
-            csv.plot(title=f"Bytes used")
+        if file_name.endswith("bytes.csv"):
+            csv = csv.set_index("length").map(lambda x: x / 1e6)
+
+            csv.plot(title=f"Bytes used ({dataset})")
             plt.grid(axis="y")
-            plt.xlabel("original string length")
-            plt.ylabel("bytes")
-            plt.savefig(f"{GRAPHS_DIR}bytes.png", dpi=300)
+            plt.xlabel("original string size (MB)")
+            plt.ylabel("new size (MB)")
+            plt.savefig(f"{GRAPHS_DIR}{dataset}_bytes.png", dpi=300)
             plt.close()
 
-            print(f"saved bytes graph")
+            print(f"saved {dataset} bytes graph")
         else:
-            dataset = file_name.replace(".csv", "")
-            average_times: DataFrame = csv.groupby(["length"]).mean().map(lambda x: x / 1000)
+            _, *subset = file_name.replace(".csv", "").split("_")
+            subset = " ".join(subset)
+            average_times: DataFrame = csv.groupby(["length"]).mean().map(lambda x: x / 1e6)
 
-            average_times.plot(title=f"Average times {dataset.replace("_", " ")}", lw=1)
+            average_times.plot(title=f"Average times {subset.replace("_", " ")} ({dataset})")
             plt.grid(axis="y")
-            plt.ylabel("microseconds")
-            plt.xlabel("original string length")
-            plt.savefig(f"{GRAPHS_DIR}{dataset}.png", dpi=300)
+            plt.ylabel("milliseconds")
+            plt.xlabel("original string size (MB)")
+            plt.savefig(f"{GRAPHS_DIR}{dataset}_{subset}.png", dpi=300)
             plt.close()
 
-            print(f"saved {dataset} graphs")
+            print(f"saved {dataset} {subset} graphs")
 
 
 if __name__ == "__main__":

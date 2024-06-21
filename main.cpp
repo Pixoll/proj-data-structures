@@ -20,9 +20,12 @@ int main(const int argc, const char *argv[]) {
     huffman_greedy::decode(huffman_greedy::encode(test_string));
     lempel_ziv_gfg::decompress(lempel_ziv_gfg::compress(test_string));
 
-    run_tests("lorem-ipsum", "lorem_ipsum.txt", 1, 20);
-    run_tests("duplicate", "duplicate.txt", 1, 20);
-    run_tests("butterfly", "butterfly.jpg", 1, 20);
+    const int tests = argc > 1 ? strtol(argv[1], nullptr, 10) : 1;
+    const int iterations = argc > 2 ? strtol(argv[2], nullptr, 10) : 20;
+
+    run_tests("lorem-ipsum", "lorem_ipsum.txt", tests, iterations);
+    run_tests("duplicate", "duplicate.txt", tests, iterations);
+    run_tests("butterfly", "butterfly.jpg", tests, iterations);
 
     return 0;
 }

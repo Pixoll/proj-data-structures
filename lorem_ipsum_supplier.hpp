@@ -14,7 +14,7 @@ private:
 
 public:
     lorem_ipsum_supplier() {
-        ifstream file("lorem_ipsum.txt");
+        ifstream file("input/lorem_ipsum.txt");
         if (!file.is_open()) {
             cerr << "could not open lorem_ipsum.txt, cannot proceed" << endl;
             exit(1);

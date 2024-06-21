@@ -35,7 +35,7 @@ def main() -> None:
             dataset = file_name.replace(".csv", "")
             average_times: DataFrame = csv.groupby(["length"]).mean().map(lambda x: x / 1000)
 
-            average_times.plot(title=f"Average times {dataset.replace("_", " ")}")
+            average_times.plot(title=f"Average times {dataset.replace("_", " ")}", lw=1)
             plt.grid(axis="y")
             plt.ylabel("microseconds")
             plt.xlabel("original string length")

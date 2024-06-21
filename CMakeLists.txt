@@ -10,4 +10,5 @@ add_executable(proj_data_structures main.cpp
         trie.hpp
         lempel_ziv_fast.hpp
         lempel_ziv_gfg.hpp
+        tests.hpp
 )

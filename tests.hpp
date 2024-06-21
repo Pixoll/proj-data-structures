@@ -19,10 +19,10 @@ string get_file_ext(const string &file_name);
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 
-void run_tests(const string &name, const string &input_file_name, int tests, int length_step, int max_iterations) {
+void run_tests(const string &name, const string &input_file_name, int tests, int max_iterations) {
     cout << "running " << name << " tests" << endl;
 
-    const string &extension = get_file_ext(input_file_name);
+//    const string &extension = get_file_ext(input_file_name);
     performance p, total;
     char_supplier supplier(input_file_name);
     stringstream out_e_vs_c, out_de_vs_dc, out_bits;
@@ -34,14 +34,14 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
 
     total.start();
 
-    if (length_step == -1)
-        length_step = supplier.size();
-
-    const int max_length = length_step * tests;
+    const int final_length = supplier.size();
+    const int length_step = final_length / tests;
     int last_length = 0;
 
-    for (int length = length_step; length <= max_length; length += length_step) {
-        const int test = length / length_step;
+    for (int test = 1; test <= tests; test++) {
+        cout << "test " << test << endl;
+
+        const int length = test < tests ? test * length_step : final_length;
         while (last_length < length) {
             input += supplier();
             last_length++;
@@ -89,19 +89,19 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
                         encoded_greedy,
                         "output/" + name + "_encoded_greedy_" + to_string(test) + ".bin"
                 );
-                huffman_greedy::write_decoded_to_file(
-                        decoded_greedy,
-                        "output/" + name + "_decoded_greedy_" + to_string(test) + "." + extension
-                );
+//                huffman_greedy::write_decoded_to_file(
+//                        decoded_greedy,
+//                        "output/" + name + "_decoded_greedy_" + to_string(test) + "." + extension
+//                );
 
                 lempel_ziv_gfg::write_compressed_to_file(
                         compressed_gfg,
                         "output/" + name + "_compressed_gfg_" + to_string(test) + ".bin"
                 );
-                lempel_ziv_gfg::write_decompressed_to_file(
-                        decompressed_gfg,
-                        "output/" + name + "_decompressed_gfg_" + to_string(test) + "." + extension
-                );
+//                lempel_ziv_gfg::write_decompressed_to_file(
+//                        decompressed_gfg,
+//                        "output/" + name + "_decompressed_gfg_" + to_string(test) + "." + extension
+//                );
             }
         }
     }
@@ -122,10 +122,6 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
 }
 
 #pragma clang diagnostic pop
-
-void run_tests(const string &name, const string &input_file_name, int iterations) {
-    run_tests(name, input_file_name, 1, -1, iterations);
-}
 
 string get_file_ext(const string &file_name) {
     stringstream stream(file_name);

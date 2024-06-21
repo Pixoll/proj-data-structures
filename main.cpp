@@ -20,9 +20,9 @@ int main(const int argc, const char *argv[]) {
     huffman_greedy::decode(huffman_greedy::encode(test_string));
     lempel_ziv_gfg::decompress(lempel_ziv_gfg::compress(test_string));
 
-    run_tests("lorem-ipsum", "lorem_ipsum.txt", 1);
-    run_tests("duplicate", "duplicate.txt", 1);
-    run_tests("butterfly", "butterfly.jpg", 1);
+    run_tests("lorem-ipsum", "lorem_ipsum.txt", 1, 20);
+    run_tests("duplicate", "duplicate.txt", 1, 20);
+    run_tests("butterfly", "butterfly.jpg", 1, 20);
 
     return 0;
 }

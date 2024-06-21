@@ -23,7 +23,7 @@ private:
         min_heap_node *left = nullptr;
         min_heap_node *right = nullptr;
 
-        min_heap_node(char data, int freq) : data(data), freq(freq) {}
+        min_heap_node(char data, unsigned int freq) : data(data), freq(freq) {}
 
         ~min_heap_node() {
             delete this->left;
@@ -67,7 +67,7 @@ public:
             auto [node, code] = code_stack.top();
             code_stack.pop();
 
-            if (node->data != min_heap_node::special_value)
+            if (node->left == nullptr && node->right == nullptr)
                 encode_map[node->data] = code;
 
             if (node->right != nullptr)

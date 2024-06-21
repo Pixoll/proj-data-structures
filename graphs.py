@@ -36,7 +36,7 @@ def main() -> None:
             print(f"saved {dataset} bytes graph")
         else:
             _, *subset = file_name.replace(".csv", "").split("_")
-            subset = " ".join(subset)
+            subset = "_".join(subset)
             average_times: DataFrame = csv.groupby(["length"]).mean().map(lambda x: x / 1e6)
 
             average_times.plot(title=f"Average times {subset.replace("_", " ")} ({dataset})")

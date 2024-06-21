@@ -52,6 +52,7 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
             const huffman_greedy::encoded_t encoded_greedy = huffman_greedy::encode(input);
             const uint64_t encode_greedy_time = p.end();
 
+            p.start();
             const string &decoded_greedy = huffman_greedy::decode(encoded_greedy);
             const uint64_t decode_greedy_time = p.end();
 

@@ -14,24 +14,24 @@ using namespace std;
 
 class huffman_greedy {
 private:
-    class min_heap_node {
+    class tree_node {
     public:
         static const char special_value = -1;
 
         const char data;
         unsigned int freq;
-        min_heap_node *left = nullptr;
-        min_heap_node *right = nullptr;
+        tree_node *left = nullptr;
+        tree_node *right = nullptr;
 
-        min_heap_node(char data, unsigned int freq) : data(data), freq(freq) {}
+        tree_node(char data, unsigned int freq) : data(data), freq(freq) {}
 
-        ~min_heap_node() {
+        ~tree_node() {
             delete this->left;
             delete this->right;
         }
 
         struct compare {
-            bool operator()(min_heap_node *l, min_heap_node *r) {
+            bool operator()(tree_node *l, tree_node *r) {
                 return l->freq > r->freq;
             }
         };
@@ -53,10 +53,10 @@ public:
             frequency_map[c]++;
 
         vector<frequency_pair_t> frequency_table(frequency_map.begin(), frequency_map.end());
-        min_heap_node *tree = make_min_heap(frequency_table);
+        tree_node *tree = make_tree(frequency_table);
 
         unordered_map<char, string> encode_map;
-        stack<pair<min_heap_node *, string>> code_stack;
+        stack<pair<tree_node *, string>> code_stack;
         code_stack.emplace(tree, "");
 
         while (!code_stack.empty()) {
@@ -104,10 +104,10 @@ public:
     static string decode(const encoded_t &encoded) {
         const auto &[_, max_bytes, last_bit, frequency_table, encoded_data] = encoded;
 
-        min_heap_node *tree = make_min_heap(frequency_table);
+        tree_node *tree = make_tree(frequency_table);
 
         string decoded;
-        min_heap_node *node = tree;
+        tree_node *node = tree;
 
         int bytes = 0;
 
@@ -191,41 +191,41 @@ public:
     }
 
 private:
-    static min_heap_node *make_min_heap(const vector<frequency_pair_t> &frequency_table) {
-        min_heap_node *left, *right, *top;
-        priority_queue<min_heap_node *, vector<min_heap_node *>, min_heap_node::compare> min_heap;
+    static tree_node *make_tree(const vector<frequency_pair_t> &frequency_table) {
+        tree_node *left, *right, *top;
+        priority_queue<tree_node *, vector<tree_node *>, tree_node::compare> tree;
 
         for (auto [data, freq]: frequency_table)
-            min_heap.push(new min_heap_node(data, freq));
+            tree.push(new tree_node(data, freq));
 
-        if (min_heap.size() == 1) {
-            left = min_heap.top();
-            min_heap.pop();
+        if (tree.size() == 1) {
+            left = tree.top();
+            tree.pop();
 
-            top = new min_heap_node(min_heap_node::special_value, left->freq);
+            top = new tree_node(tree_node::special_value, left->freq);
             top->left = left;
 
             return top;
         }
 
-        while (min_heap.size() != 1) {
-            left = min_heap.top();
-            min_heap.pop();
+        while (tree.size() != 1) {
+            left = tree.top();
+            tree.pop();
 
-            right = min_heap.top();
-            min_heap.pop();
+            right = tree.top();
+            tree.pop();
 
-            top = new min_heap_node(min_heap_node::special_value, left->freq + right->freq);
+            top = new tree_node(tree_node::special_value, left->freq + right->freq);
             top->left = left;
             top->right = right;
 
-            min_heap.push(top);
+            tree.push(top);
         }
 
-        return min_heap.top();
+        return tree.top();
     }
 
-//    static void print_tree(const string &prefix, const min_heap_node *node, bool is_left) {
+//    static void print_tree(const string &prefix, const tree_node *node, bool is_left) {
 //        if (node == nullptr)
 //            return;
 //
@@ -237,7 +237,7 @@ private:
 //        print_tree(prefix + (is_left ? "│   " : "    "), node->right, false);
 //    }
 //
-//    static void print_tree(const min_heap_node *node) {
+//    static void print_tree(const tree_node *node) {
 //        print_tree("", node, false);
 //        cout << endl;
 //    }

@@ -52,10 +52,9 @@ public:
         for (const char c: input)
             frequency_map[c]++;
 
-        const int unique_chars = frequency_map.size(); // NOLINT(*-narrowing-conversions)
         vector<frequency_pair_t> frequency_table(frequency_map.begin(), frequency_map.end());
-
         min_heap_node *tree = make_min_heap(frequency_table);
+
         unordered_map<char, string> encode_map;
         stack<pair<min_heap_node *, string>> code_stack;
         code_stack.emplace(tree, "");
@@ -99,7 +98,7 @@ public:
 
         delete tree;
 
-        return {unique_chars, bytes, bits, frequency_table, encoded_data};
+        return {frequency_table.size(), bytes, bits, frequency_table, encoded_data};
     }
 
     static string decode(const encoded_t &encoded) {

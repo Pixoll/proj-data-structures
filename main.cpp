@@ -36,9 +36,14 @@ int main(const int argc, const char *argv[]) {
         run_tests("butterfly", "butterfly.jpg", tests, iterations);
     }, tests, iterations);
 
+    thread data_structures_pdf_thread([](int tests, int iterations) {
+        run_tests("data-structures-pdf", "data-structures-pdf.pdf", tests, iterations);
+    }, tests, iterations);
+
     lorem_ipsum_thread.join();
     duplicate_thread.join();
     butterfly_thread.join();
+    data_structures_pdf_thread.join();
 
     return 0;
 }

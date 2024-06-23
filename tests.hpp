@@ -73,8 +73,8 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
                          << decompress_gfg_time << "\n";
 
             if (i == 0) {
-                cout << "huffman greedy: " << (decoded_greedy == input ? "true" : "false") << "\n"
-                     << "lempel-ziv gfg: " << (decompressed_gfg == input ? "true" : "false") << "\n";
+//                cout << "huffman greedy: " << (decoded_greedy == input ? "true" : "false") << "\n"
+//                     << "lempel-ziv gfg: " << (decompressed_gfg == input ? "true" : "false") << "\n";
 
                 const long long encoded_greedy_size = huffman_greedy::frequencies_offset
                                                       + get<3>(encoded_greedy).size()

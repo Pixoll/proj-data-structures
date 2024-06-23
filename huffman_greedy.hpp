@@ -89,8 +89,6 @@ public:
             }
         }
 
-        const int bytes = encoded_data.size(); // NOLINT(*-narrowing-conversions)
-
         if (bits > 0) {
             byte <<= (8 - bits);
             encoded_data.push_back(byte);
@@ -98,7 +96,7 @@ public:
 
         delete tree;
 
-        return {frequency_table.size(), bytes, bits, frequency_table, encoded_data};
+        return {frequency_table.size(), encoded_data.size(), bits, frequency_table, encoded_data};
     }
 
     static string decode(const encoded_t &encoded) {

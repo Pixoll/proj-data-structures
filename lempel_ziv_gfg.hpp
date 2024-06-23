@@ -15,8 +15,7 @@ public:
         for (int i = 0; i <= 255; i++)
             table[string(1, char(i))] = i;
 
-        string previous;
-        previous += input[0];
+        string previous(1, input[0]);
 
         int code = 256;
         compressed_t compressed;

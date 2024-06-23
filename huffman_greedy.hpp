@@ -53,10 +53,7 @@ public:
             frequency_map[c]++;
 
         const int unique_chars = frequency_map.size(); // NOLINT(*-narrowing-conversions)
-        vector<frequency_pair_t> frequency_table;
-        frequency_table.reserve(unique_chars);
-        for (const auto &[c, f]: frequency_map)
-            frequency_table.emplace_back(c, f);
+        vector<frequency_pair_t> frequency_table(frequency_map.begin(), frequency_map.end());
 
         min_heap_node *tree = make_min_heap(frequency_table);
         unordered_map<char, string> encode_map;

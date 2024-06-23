@@ -20,8 +20,6 @@ string get_file_ext(const string &file_name);
 #pragma ide diagnostic ignored "cppcoreguidelines-narrowing-conversions"
 
 void run_tests(const string &name, const string &input_file_name, int tests, int iterations) {
-    cout << "running " << name << " tests" << endl;
-
 //    const string &extension = get_file_ext(input_file_name);
     performance p, total;
     char_supplier supplier(input_file_name);
@@ -39,7 +37,7 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
     int last_length = 0;
 
     for (int test = 1; test <= tests; test++) {
-        cout << "test " << test << endl;
+        cout << name << " test " << test << endl;
 
         const int length = test < tests ? test * length_step : final_length;
         while (last_length < length) {
@@ -119,7 +117,7 @@ void run_tests(const string &name, const string &input_file_name, int tests, int
     file_de_vs_dc.close();
     file_bits.close();
 
-    cout << "finished, took " << total.end<performance::milliseconds>() / 1e3 << " s\n" << endl;
+    cout << "finished " << name << ", took " << total.end<performance::milliseconds>() / 1e3 << " s\n" << endl;
 }
 
 #pragma clang diagnostic pop

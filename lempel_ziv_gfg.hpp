@@ -12,11 +12,8 @@ public:
 
     static compressed_t compress(const string &input) {
         unordered_map<string, int> table;
-        for (int i = 0; i <= 255; i++) {
-            string ch;
-            ch += char(i);
-            table[ch] = i;
-        }
+        for (int i = 0; i <= 255; i++)
+            table[string(1, char(i))] = i;
 
         string previous;
         previous += input[0];

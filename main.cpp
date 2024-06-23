@@ -2,6 +2,7 @@
 #include "lempel_ziv_gfg.hpp"
 #include "tests.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <thread>
 
@@ -21,8 +22,8 @@ int main(const int argc, const char *argv[]) {
     huffman_greedy::decode(huffman_greedy::encode(test_string));
     lempel_ziv_gfg::decompress(lempel_ziv_gfg::compress(test_string));
 
-    const int tests = argc > 1 ? strtol(argv[1], nullptr, 10) : 100;
-    const int iterations = argc > 2 ? strtol(argv[2], nullptr, 10) : 20;
+    const int tests = argc > 1 ? max(strtol(argv[1], nullptr, 10), 1l) : 100;
+    const int iterations = argc > 2 ? max(strtol(argv[2], nullptr, 10), 1l) : 20;
 
     thread lorem_ipsum_thread([](int tests, int iterations) {
         run_tests("lorem-ipsum", "lorem_ipsum.txt", tests, iterations);

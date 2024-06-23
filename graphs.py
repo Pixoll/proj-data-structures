@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plot
 from os import listdir, mkdir, path
 from pandas import read_csv, DataFrame
 from shutil import rmtree
@@ -20,33 +20,29 @@ def main() -> None:
     for file_name in listdir(DATA_DIR):
         csv = read_csv(DATA_DIR + file_name, delimiter=",")
         dataset = file_name.split("_")[0]
+        # noinspection PyUnusedLocal
+        subset = ""
 
         csv["length"] = csv["length"].map(lambda x: x / 1e6)
 
         if file_name.endswith("bytes.csv"):
+            subset = "bytes"
             csv = csv.set_index("length").map(lambda x: x / 1e6)
 
             csv.plot(title=f"Bytes used ({dataset})")
-            plt.grid(axis="y")
-            plt.xlabel("original string size (MB)")
-            plt.ylabel("new size (MB)")
-            plt.savefig(f"{GRAPHS_DIR}{dataset}_bytes.png", dpi=300)
-            plt.close()
-
-            print(f"saved {dataset} bytes graph")
+            plot.ylabel("new size (MB)")
         else:
-            _, *subset = file_name.replace(".csv", "").split("_")
-            subset = "_".join(subset)
+            subset = "_".join(file_name.replace(".csv", "").split("_")[1:])
             average_times: DataFrame = csv.groupby(["length"]).mean().map(lambda x: x / 1e6)
 
             average_times.plot(title=f"Average times {subset.replace("_", " ")} ({dataset})")
-            plt.grid(axis="y")
-            plt.ylabel("milliseconds")
-            plt.xlabel("original string size (MB)")
-            plt.savefig(f"{GRAPHS_DIR}{dataset}_{subset}.png", dpi=300)
-            plt.close()
+            plot.ylabel("milliseconds")
 
-            print(f"saved {dataset} {subset} graphs")
+        plot.grid(axis="y")
+        plot.xlabel("original size (MB)")
+        plot.savefig(f"{GRAPHS_DIR}{dataset}_{subset}.png", dpi=300)
+        plot.close()
+        print(f"saved {dataset} {subset} graphs")
 
 
 if __name__ == "__main__":

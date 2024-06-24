@@ -44,12 +44,10 @@ public:
         for (int i = 0; i <= 255; i++)
             table[i] += char(i);
 
-        string decompressed;
         int previous = compressed[0];
         string substring = table[previous];
+        string decompressed = substring;
         char c = substring[0];
-
-        decompressed += substring;
         int code = 256;
 
         for (int i = 0; i < compressed.size() - 1; i++) {

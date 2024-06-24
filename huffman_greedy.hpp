@@ -112,7 +112,6 @@ public:
 
         string decoded;
         tree_node *node = tree;
-
         int bytes = 0;
 
         for (const unsigned char byte: encoded_data) {
@@ -135,6 +134,8 @@ public:
         delete tree;
 
         return decoded;
+
+        read_encoded_from_file("");
     }
 
     static void write_encoded_to_file(const encoded_t &encoded, const string &file_name) {

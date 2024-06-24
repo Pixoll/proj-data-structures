@@ -30,6 +30,7 @@ def main() -> None:
             csv = csv.set_index("length").map(lambda x: x / 1e6)
 
             csv.plot(title=f"Bytes used ({dataset})")
+            plot.axline((0, 0), slope=1, alpha=0.25, color="0", label="original size")
             plot.ylabel("new size (MB)")
         else:
             subset = "_".join(file_name.replace(".csv", "").split("_")[1:])

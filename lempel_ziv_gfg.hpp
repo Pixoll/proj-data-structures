@@ -16,7 +16,6 @@ public:
             table[string(1, char(i))] = i;
 
         string previous(1, input[0]);
-
         int code = 256;
         compressed_t compressed;
 

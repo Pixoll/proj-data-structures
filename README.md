@@ -1,5 +1,7 @@
 # C++ Project - Data Structures class
 
+Your CPU must have at least 4 threads.
+
 ### Dependencies
 
 - Python >= 3.10

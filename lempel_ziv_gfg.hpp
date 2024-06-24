@@ -30,8 +30,7 @@ public:
             }
 
             compressed.push_back(table[previous]);
-            table[previous + current] = code;
-            code++;
+            table[previous + current] = code++;
             previous = current;
         }
 

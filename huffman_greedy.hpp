@@ -100,7 +100,13 @@ public:
     }
 
     static string decode(const encoded_t &encoded) {
-        const auto &[_, max_bytes, last_bit, frequency_table, encoded_data] = encoded;
+        const auto &[
+                _,
+                max_bytes,
+                last_bit,
+                frequency_table,
+                encoded_data
+        ] = encoded;
 
         tree_node *tree = make_tree(frequency_table);
 
